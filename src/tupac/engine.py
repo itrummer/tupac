@@ -59,7 +59,8 @@ class PgSimEnv(Env):
         
         reward = self._reward()
         total_s = time.time() - self.start_s
-        self.log += [(self.nr_steps, self.nr_indexed, total_s, reward)]
+        log_entry = (self.nr_steps, self.nr_indexed, total_s, reward, 1-reward)
+        self.log += [log_entry]
         return reward, self.nr_indexed, False, False, {}
     
     def _add_index(self):

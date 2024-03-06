@@ -22,8 +22,8 @@ if __name__ == '__main__':
         normalize_advantage=True)
     model.learn(total_timesteps=1)
     
-    for step, nr_indexed, total_s, reward in env.log:
-        print(f'{step}\t{nr_indexed}\t{total_s}\t{reward}')
+    for step, nr_indexed, total_s, reward, relative_time in env.log:
+        print(f'{step}\t{nr_indexed}\t{total_s}\t{reward}\t{relative_time}')
     
     # print('Testing Now!!!')
     # env = model.get_env()
