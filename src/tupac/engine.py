@@ -83,17 +83,19 @@ class PgSimEnv(Env):
 class PgEnv(PgSimEnv):
     """ Tuning environment for Postgres. """
     
-    def __init__(self, db, user, password):
+    def __init__(self, db, user, password, granularity=1):
         """ Initializes connection to database.
         
         Args:
             db: name of database to tune.
             user: name of database user.
             password: password for database access.
+            granularity: how many batches to index/de-index in one step.
         """
         super().__init__()
         self.connection = psycopg2.connect(
             f'dbname={db} user={user} password={password}')
+        self.granularity = granularity
         self.reset(0)
         self.default_secs = self._benchmark()
     
@@ -114,11 +116,13 @@ class PgEnv(PgSimEnv):
         self.connection.close()
     
     def _add_index(self):
-        """ Index the next data batch. """
-        if self.nr_indexed < nr_batches:
+        """ Index the next data batch(es). """
+        nr_batches_todo = min(self.granularity, nr_batches-self.nr_indexed)
+        max_batch_id = self.nr_indexed+nr_batches_todo
+        for batch_id in range(self.nr_indexed, max_batch_id):
             sql = (
-                f'create index if not exists shipdateindex{self.nr_indexed} ' 
-                f'on lineitem{self.nr_indexed}(l_shipdate);')
+                f'create index if not exists shipdateindex{batch_id} ' 
+                f'on lineitem{batch_id}(l_shipdate);')
             self._run_sql(sql)
             self.nr_indexed += 1
     
@@ -139,12 +143,14 @@ class PgEnv(PgSimEnv):
         return total_s
     
     def _drop_index(self):
-        """ Drop index for one data batch. """
-        if self.nr_indexed > 0:
-            sql = f'drop index if exists shipdateindex{self.nr_indexed}'
+        """ Drop index for one or several data batches. """
+        nr_batches_todo = min(self.nr_indexed, self.granularity)
+        min_batch_id = self.nr_indexed - nr_batches_todo
+        for batch_id in range(min_batch_id, self.nr_indexed):
+            sql = f'drop index if exists shipdateindex{batch_id}'
             self._run_sql(sql)
             self.nr_indexed -= 1
-    
+
     def _reward(self):
         """ Calculate reward by benchmarking simple query.
         

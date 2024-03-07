@@ -16,11 +16,11 @@ if __name__ == '__main__':
     parser.add_argument('password', type=str, help='Database password')
     args = parser.parse_args()
     
-    env = tupac.engine.PgEnv(args.db, args.user, args.password)
+    env = tupac.engine.PgEnv(args.db, args.user, args.password, 10)
     model = stable_baselines3.A2C(
         'MlpPolicy', env, verbose=True, 
         normalize_advantage=True)
-    model.learn(total_timesteps=1)
+    model.learn(total_timesteps=20)
     
     for step, nr_indexed, total_s, reward, relative_time in env.log:
         print(f'{step}\t{nr_indexed}\t{total_s}\t{reward}\t{relative_time}')
