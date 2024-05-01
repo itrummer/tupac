@@ -1,1 +1,5 @@
-# tupac
+# TUPAC: Tuning with Partial Configurations
+
+Reinforcement learning is the method of choice for physical design optimization in database management systems. While such methods find near-optimal designs, they suffer from significant query performance fluctuations while trying out different design options. TUPAC avoids performance fluctuations by optimizing within a "continuous" space of physical designs, applying indexing choices only to small parts of data. This enables exploration by making small, incremental changes to the design that apply only to data subsets. The resulting approach is significantly more robust than prior methods. 
+
+TUPAC is an early prototype and considers only a limited scenario. It was developed over the course of the Dagstuhl seminar on [Robust Query Processing in the Cloud](https://www.dagstuhl.de/de/seminars/seminar-calendar/seminar-details/24101). First results are described in [this presentation](https://drive.google.com/file/d/1Tt7rFwIR4bAJqEGl84dNpow36vXZiL8A/view?usp=sharing).
